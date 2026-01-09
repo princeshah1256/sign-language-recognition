@@ -1,37 +1,9 @@
-"""
-Sign Language Recognition System (Terminal-friendly)
-- Uses Kaggle-style ASL image dataset (folder-per-class).
-- Works on Windows / PowerShell.
-- Avoids notebook-only functions and fixes keras import resolution.
-
-Expected dataset folder structure:
-  <project_root>/data/asl/
-      A/
-        img1.jpg
-        img2.jpg
-      B/
-      ...
-      space/
-      nothing/
-      del/
-
-How to run:
-  1) Activate venv:
-        .venv\Scripts\activate
-  2) Install deps:
-        python -m pip install --upgrade pip
-        python -m pip install numpy opencv-python scikit-learn tensorflow keras
-  3) Run:
-        python .\Sign_Language_Recognition_System_final.py
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
 import numpy as np
 import cv2
 
-# Use standalone Keras imports to avoid "tensorflow.keras could not be resolved" in VS Code.
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from keras.callbacks import EarlyStopping
@@ -40,13 +12,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
 
 
-# -----------------------------
-# Config
-# -----------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent
-DATA_PATH = PROJECT_ROOT / "data" / "asl"  # put Kaggle ASL folders here
+DATA_PATH = PROJECT_ROOT / "data" / "asl"
 IMG_SIZE = 64
-MAX_IMAGES_PER_CLASS = 1500  # lower (e.g., 300-800) if your PC is slow / low RAM
+MAX_IMAGES_PER_CLASS = 1500
 RANDOM_SEED = 42
 EPOCHS = 8
 BATCH_SIZE = 32
@@ -57,14 +26,6 @@ def load_asl_image_dataset(
     img_size: int = 64,
     max_images_per_class: int | None = None,
 ) -> tuple[np.ndarray, np.ndarray, list[str]]:
-    """
-    Loads images from:
-        data_path/<label_name>/*.jpg|png|jpeg
-    Returns:
-        X: (N, img_size, img_size, 3) float32 in [0,1]
-        y: (N,) int labels
-        labels: list of label names in index order
-    """
     if not data_path.exists():
         raise FileNotFoundError(
             f"Dataset folder not found: {data_path}\n"
@@ -99,7 +60,7 @@ def load_asl_image_dataset(
             if img is None:
                 continue
             img = cv2.resize(img, (img_size, img_size), interpolation=cv2.INTER_AREA)
-            X_list.append(img)      # shape (H,W,3)
+            X_list.append(img)
             y_list.append(idx)
 
         print(f"Loaded {len(files):>4} images from class '{label}'")
